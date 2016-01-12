@@ -2,7 +2,7 @@
 " Author: Lucas Groenendaal <groenendaal92@gmail.com>
 
 if exists("g:loaded_createvariable") || &cp || v:version < 700
-  finish
+    finish
 endif
 let g:loaded_createvariable = 1
 
@@ -94,13 +94,13 @@ endfunction
 nnoremap <silent> <Plug>Createvariable :<C-u>set operatorfunc=<SID>create_variable<CR>g@
 xnoremap <silent> <Plug>Createvariable :<C-u>call <SID>create_variable(visualmode(), 1)<CR>
 if !hasmapto('<Plug>Createvariable', 'n')
-    if maparg('yc', 'n') ==# ''
-        nmap yc <Plug>Createvariable
+    if maparg('gC', 'n') ==# ''
+        nmap gC <Plug>Createvariable
     endif
 endif
 if !hasmapto('<Plug>Createvariable', 'v')
-    if maparg('C', 'x') ==# ''
-        xmap C <Plug>Createvariable
+    if maparg('gC', 'x') ==# ''
+        xmap gC <Plug>Createvariable
     endif
 endif
 

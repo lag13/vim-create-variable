@@ -1,0 +1,57 @@
+*createvariable.txt*	Operator to create variables
+
+Author: Lucas Groenendaal <groenendaal92@gmail.com>
+
+======================================================================================
+INTRODUCTION                                             *createvariable-introduction*
+
+Defines an operator which stores the text being operated on into a variable.
+
+======================================================================================
+EXAMPLE                                                      *createvariable-examples*
+
+Say we write this line of code and our cursor is on the first 'e' in 'escape':
+
+    let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
+                               ^
+
+We want to break this line up a bit so it is more readable. To do this we issue
+the command gC% and a prompt will appear asking for a variable name. Let's say
+'escaped_str' is entered. The result would then look like this:
+
+    let escaped_str = escape(@s, a:cmdtype.'\')
+    let @/ = '\V' . substitute(escaped_str, '\n', '\\n', 'g')
+
+======================================================================================
+MAPPINGS                                                     *createvariable-mappings*
+
+                                            *gC*
+gC{motion}              Create a variable whose value is the text that {motion} moves over.
+
+                                            *v_gC*
+{Visual}gC              Create a variable whose value is the highlighted text.
+
+======================================================================================
+SETTINGS                                                     *createvariable-settings*
+
+You can customize the mappings to your liking. The default mappings are as
+follows:
+
+    nmap gC <Plug>Createvariable
+    xmap gC <Plug>Createvariable
+
+For example, these mappings could be defined instead:
+
+    nmap yc <Plug>Createvariable
+    xmap C <Plug>Createvariable
+
+                                                     *createvariable_replace_multiple*
+g:createvariable_replace_multiple ~
+
+By default this variable is 0 (false) which means that only the text that was
+operated on will be replaced with the variable name. If this variable is set to
+true it will replace all occurrences of the operated text with the variable
+name where the operated text occurs on lines of the same indent or more as the
+current line stopping the replacement when a line of lesser indent is reached.
+
+ vim:tw=78:ts=8:ft=help:norl:
