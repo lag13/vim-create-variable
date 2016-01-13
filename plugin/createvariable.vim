@@ -8,10 +8,15 @@ let g:loaded_createvariable = 1
 
 augroup createvariable
     autocmd!
-    autocmd FileType php let b:createvariable_prefix = '$'
-    autocmd FileType vim let b:createvariable_prefix = 'let '
-    autocmd FileType c,cpp,cs,java,javascript,php let b:createvariable_end = ';'
-    autocmd FileType sh let b:createvariable_middle = '='
+    autocmd FileType vim let b:createvariable_aprefix = 'let '
+    autocmd FileType php
+                \ let b:createvariable_aprefix = '$' |
+                \ let b:createvariable_prefix = '$'
+    autocmd FileType sh
+                \ let b:createvariable_amiddle = '=' |
+                \ let b:createvariable_prefix = '"$' |
+                \ let b:createvariable_end = '"'
+    autocmd FileType c,cpp,cs,java,javascript,php let b:createvariable_aend = ';'
     autocmd FileType c,cpp,java let b:createvariable_remove_var_type = 1
 augroup END
 
@@ -35,8 +40,9 @@ function! s:get_rval(type, visual)
     return split(rval, "\n")
 endfunction
 
-" In some languages you have to specify a type when creating a variable. This
-" function aims to remove the type and just return the variable name.
+" In some languages you have to specify a type when initially creating a
+" variable. This function aims to remove the type and just return the variable
+" name.
 function! s:remove_var_type(remove_typep, left_assignment, lastp)
     if a:remove_typep
         return matchstr(a:left_assignment, a:lastp ? '^\S*' : '\S*$')
@@ -45,10 +51,10 @@ function! s:remove_var_type(remove_typep, left_assignment, lastp)
     endif
 endfunction
 
-function! s:build_assignment(indent, prefix, left_side, middle, rval, end)
+function! s:build_assignment(indent, aprefix, left_side, amiddle, rval, aend)
     let rval = copy(a:rval)
-    let rval[0] = a:indent . a:prefix . a:left_side . a:middle . rval[0]
-    let rval[len(rval)-1] .= a:end
+    let rval[0] = a:indent . a:aprefix . a:left_side . a:amiddle . rval[0]
+    let rval[len(rval)-1] .= a:aend
     return rval
 endfunction
 
@@ -66,24 +72,23 @@ function! s:find_last_line_to_change(replace_multiplep, start_line)
 endfunction
 
 function! s:create_variable(type, ...)
+    let aprefix = s:get_setting("createvariable_aprefix", '')
+    let aend = s:get_setting("createvariable_aend", '')
+    let amiddle = s:get_setting("createvariable_amiddle", ' = ')
     let prefix = s:get_setting("createvariable_prefix", '')
-    let middle = s:get_setting("createvariable_middle", ' = ')
     let end = s:get_setting("createvariable_end", '')
     let replace_multiple = s:get_setting('createvariable_replace_multiple', 0)
     let remove_var_type = s:get_setting('createvariable_remove_var_type', 0)
 
     let rval = s:get_rval(a:type, a:0)
-    " TODO: Rather than have the user input the variable name using input(),
-    " consider letting them type the variable name directly into the buffer.
     let left_side = input("Variable Name: ")
     if left_side !=# ''
-        " Create variable assignment
-        let lval = s:remove_var_type(remove_var_type, left_side, remove_var_type - 1)
+        let raw_lval = s:remove_var_type(remove_var_type, left_side, remove_var_type - 1)
+        let lval = prefix.raw_lval.end
         let indent = matchstr(getline(line('.')), '^\s*')
-        let assignment = s:build_assignment(indent, prefix, left_side, middle, rval, end)
+        let assignment = s:build_assignment(indent, aprefix, left_side, amiddle, rval, aend)
         call append(line('.') - 1, assignment)
 
-        " Replace rval with the variable name
         let start_line = line('.')
         let end_line = s:find_last_line_to_change(replace_multiple, start_line)
         let rval_str = substitute(escape(join(rval, "\n"), '/\'), '\n', '\\n', 'g')
