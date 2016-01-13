@@ -10,17 +10,17 @@ Defines an operator which stores the text being operated on into a variable.
 ======================================================================================
 EXAMPLE                                                      *createvariable-examples*
 
-Say we write this line of code and our cursor is on the first 'e' in 'escape':
+Say we write this line of code and our cursor is on the first "e" in "escape":
 
-    let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
+    let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g') ~
                                ^
 
 We want to break this line up so it is more readable. With this plugin we can
 type `gC%` and a prompt will appear asking for a variable name. Let's say you
-enter 'escaped_str'. The result would then look like this:
+enter "escaped_str". The result would then look like this:
 
-    let escaped_str = escape(@s, a:cmdtype.'\')
-    let @/ = '\V' . substitute(escaped_str, '\n', '\\n', 'g')
+    let escaped_str = escape(@s, a:cmdtype.'\') ~
+    let @/ = '\V' . substitute(escaped_str, '\n', '\\n', 'g') ~
 
 ======================================================================================
 MAPPINGS                                                     *createvariable-mappings*
@@ -34,8 +34,7 @@ gC{motion}              Create a variable whose value is the text that {motion} 
 ======================================================================================
 SETTINGS                                                     *createvariable-settings*
 
-You can customize the mappings to your liking. The default mappings are as
-follows:
+You can customize the mappings to your liking. The default mappings are:
 
     nmap gC <Plug>Createvariable
     xmap gC <Plug>Createvariable
@@ -71,7 +70,7 @@ say we have this php code:
         3
     );
 
-If we pull out func2 into a variable 'hi' then it will look like this:
+If we pull out func2 into a variable "hi" then it will look like this:
 
     $test = 1 + func(
         $hi = func2(
@@ -101,7 +100,7 @@ have this php code:
     $test = 1 + func(1, 2, 3) + some_func_name();
                 ^
 
-If we typed `gCiw` and entered 'hi' then we'd end up with this:
+If we typed `gCiw` and entered "hi" then we'd end up with this:
 
     $hi = func;
     $test = 1 + $hi(1, 2, 3) + some_$hi_name();
