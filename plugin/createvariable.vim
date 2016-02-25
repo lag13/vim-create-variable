@@ -1,10 +1,10 @@
 " createvariable.vim - Store selected text in a variable
 " Author: Lucas Groenendaal <groenendaal92@gmail.com>
 
-if exists("g:loaded_createvariable") || &cp || v:version < 700
-    finish
-endif
-let g:loaded_createvariable = 1
+" if exists("g:loaded_createvariable") || &cp || v:version < 700
+"     finish
+" endif
+" let g:loaded_createvariable = 1
 
 augroup createvariable
     autocmd!
@@ -18,6 +18,7 @@ augroup createvariable
                 \ let b:createvariable_end = '"'
     autocmd FileType c,cpp,cs,java,javascript,php let b:createvariable_aend = ';'
     autocmd FileType c,cpp,java let b:createvariable_remove_var_type = 1
+    autocmd FileType go let b:createvariable_amiddle = ' := '
 augroup END
 
 function! s:get_setting(setting, default)
@@ -43,9 +44,9 @@ endfunction
 " In some languages you have to specify a type when initially creating a
 " variable. This function aims to remove the type and just return the variable
 " name.
-function! s:remove_var_type(remove_typep, left_assignment, lastp)
+function! s:remove_var_type(remove_typep, left_assignment)
     if a:remove_typep
-        return matchstr(a:left_assignment, a:lastp ? '^\S*' : '\S*$')
+        return matchstr(a:left_assignment, '\S*$')
     else
         return a:left_assignment
     endif
@@ -83,7 +84,7 @@ function! s:create_variable(type, ...)
     let rval = s:get_rval(a:type, a:0)
     let left_side = input("Variable Name: ")
     if left_side !=# ''
-        let raw_lval = s:remove_var_type(remove_var_type, left_side, remove_var_type - 1)
+        let raw_lval = s:remove_var_type(remove_var_type, left_side)
         let lval = prefix.raw_lval.end
         let indent = matchstr(getline(line('.')), '^\s*')
         let assignment = s:build_assignment(indent, aprefix, left_side, amiddle, rval, aend)
